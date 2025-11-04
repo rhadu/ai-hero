@@ -4,7 +4,7 @@ import { z } from 'zod';
 import * as fsTools from './file-system-functionality.ts';
 
 const PROMPT = `
-  Write me a poem about a pirate in pirate.md
+  Write me a csv with the 10 cities with the most population in the world. Use data from your knowledge base.
 `;
 
 const result = streamText({

@@ -59,6 +59,9 @@ evalite('TS Release Notes', {
         <question>
         ${input}
         </question>
+        
+        ALWAYS include markdown links to correct typescript version documentation in your output.
+        ALWAYS be extremely concise in your output. Keep it under 500 characters.
       `,
     });
 
@@ -68,13 +71,62 @@ evalite('TS Release Notes', {
     {
       name: 'Includes Markdown Links',
       scorer: ({ input, output, expected }) => {
-        // TODO: check if the output includes markdown links
+        // TODO: check with regex if the output includes markdown links
+        const markdownLinksRegex = /\[.*?\]\(.*?\)/g;
+        const markdownLinksFound = markdownLinksRegex.test(output);
+        return markdownLinksFound ? 1 : 0;
       },
     },
     {
       name: 'Output length',
       scorer: ({ input, output, expected }) => {
-        // TODO: check if the output is less than 500 characters
+        // TODO: check with regex if the output is less than 500 characters
+        const outputLength = output.length;
+        return outputLength < 500 ? 1 : 0;
+      },
+    },
+    {
+      name: 'TypeScript Version Found in Input',
+      scorer: ({ input, output, expected }) => {
+        // TODO: check if TypeScript version regex matches the input
+        const typescriptVersionRegex = /TypeScript (\d+\.\d+)/;
+        const typescriptVersionMatch = input.match(typescriptVersionRegex);
+        return typescriptVersionMatch ? 1 : 0;
+      },
+    },
+    {
+      name: 'Correct Doc Link Exists in Links',
+      scorer: ({ input, output, expected }) => {
+        // TODO: check if the correct doc link exists in the links array
+        const typescriptVersionRegex = /TypeScript (\d+\.\d+)/;
+        const typescriptVersionMatch = input.match(typescriptVersionRegex);
+        if (!typescriptVersionMatch) {
+          return 0;
+        }
+
+        const correctDocLink = links.find((link) => link.title.includes(typescriptVersionMatch[0]));
+        return correctDocLink ? 1 : 0;
+      },
+    },
+    {
+      name: 'Correct Doc Link in Output',
+      scorer: ({ input, output, expected }) => {
+        // TODO: check if the output includes the correct doc link
+        const typescriptVersionRegex = /TypeScript (\d+\.\d+)/;
+        const typescriptVersionMatch = input.match(typescriptVersionRegex);
+        if (!typescriptVersionMatch) {
+          return 0;
+        }
+
+        const correctDocLink = links.find((link) => link.title.includes(typescriptVersionMatch[0]));
+        if (!correctDocLink) {
+          return 0;
+        }
+
+        // check just the link () without title in output with regex and return 1 if it exists, 0 if it doesn't
+        const linkRegex = `\(${correctDocLink.url}\)`;
+        const linkFound = output.includes(linkRegex);
+        return linkFound ? 1 : 0;
       },
     },
   ],

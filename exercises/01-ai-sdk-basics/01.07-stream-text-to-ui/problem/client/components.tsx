@@ -31,7 +31,9 @@ export const Message = ({
     .join('');
   return (
     <div className="prose prose-invert my-6">
-      <ReactMarkdown>{prefix + text}</ReactMarkdown>
+      <ReactMarkdown>
+        {prefix + text}
+        </ReactMarkdown>
     </div>
   );
 };

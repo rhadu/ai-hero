@@ -34,7 +34,7 @@ const asXML = DATA.map(
     `<item url="${item.url}" title="${item.title}"></item>`,
 ).join('\n');
 
-const asJSON = JSON.stringify(DATA, null, 2);
+const asJSON = JSON.stringify(DATA);
 
 const asMarkdown = DATA.map(
   (item) => `- [${item.title}](${item.url})`,

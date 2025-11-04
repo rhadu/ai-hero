@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatInput, Message, Wrapper } from './components.tsx';
 import './tailwind.css';
+import type { UIDataTypes, UIMessagePart, UITools } from 'ai';
 
 const App = () => {
   const { messages, sendMessage } = useChat({});
@@ -44,9 +45,26 @@ const App = () => {
           // called fileToDataURL that you can use to
           // convert the file to a data URL. This
           // will be useful!
+          
+          const parts: UIMessagePart<UIDataTypes, UITools>[] = [
+            {
+              type: 'text',
+              text: input,
+            },
+          ];
+          
+          // Only add file part if file exists
+          if (file && file.size > 0) {
+            parts.push({
+              type: 'file',
+              mediaType: file.type,
+              url: await fileToDataURL(file),
+            });
+          }
+          
           sendMessage({
             // NOTE: 'parts' will be useful
-            text: input,
+            parts,
           });
 
           setInput('');

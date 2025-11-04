@@ -71,7 +71,7 @@ export const POST = async (req: Request): Promise<Response> => {
     messages: modelMessages,
     experimental_telemetry: {
       isEnabled: true,
-      functionId: 'chat',
+      functionId: 'stream-text',
       metadata: {
         langfuseTraceId: trace.id,
       },

@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { streamText } from 'ai';
+import { Output, streamText } from 'ai';
 
 const INPUT = `Do some research on induction hobs and how I can replace a 100cm wide AGA cooker with an induction range cooker. Which is the cheapest, which is the best?`;
 
@@ -11,10 +11,24 @@ const result = await streamText({
   // the previous exercise.
   // You will NOT need all of the sections from the template.
   prompt: `
-    Generate me a title:
+    <task-context>
+    You are a helpful assistant that can generate titles for conversations.
+    </task-context>
+
+    <conversation-history>
     ${INPUT}
+    </conversation-history>
+
+    <the-ask>
+    Generate a title for the conversation.
+    </the-ask>
+
+    <output-format>
+    Return only the title.
+    </output-format>
   `,
 });
+
 
 for await (const chunk of result.textStream) {
   process.stdout.write(chunk);

@@ -1,9 +1,13 @@
 import { google } from '@ai-sdk/google';
 import {
   convertToModelMessages,
+  stepCountIs,
   streamText,
+  tool,
   type UIMessage,
 } from 'ai';
+import { z } from 'zod';
+import * as fsTools from './file-system-functionality.ts';
 
 export const POST = async (req: Request): Promise<Response> => {
   const body: { messages: UIMessage[] } = await req.json();
@@ -29,11 +33,91 @@ export const POST = async (req: Request): Promise<Response> => {
       Use markdown files to store information.
     `,
     // TODO: add the tools to the streamText call,
-    tools: TODO,
+    tools: {
+      writeFile: tool({
+        description: 'Write to a file',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the file to create'),
+          content: z.string().describe('The content of the file to create'),
+        }),
+        execute: async ({ path, content }) => {
+          return fsTools.writeFile(path, content);
+        },
+      }),
+      readFile: tool({
+        description: 'Read a file',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the file to read'),
+        }),
+        execute: async ({ path }) => {
+          return fsTools.readFile(path);
+        },
+      }),
+      deletePath: tool({
+        description: 'Delete a file or directory',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the file or directory to delete'),
+        }),
+        execute: async ({ path }) => {
+          return fsTools.deletePath(path);
+        },
+      }),
+      listDirectory: tool({
+        description: 'List a directory',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the directory to list'),
+        }),
+        execute: async ({ path }) => {
+          return fsTools.listDirectory(path);
+        },
+      }),
+      createDirectory: tool({
+        description: 'Create a directory',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the directory to create'),
+        }),
+        execute: async ({ path }) => {
+          return fsTools.createDirectory(path);
+        },
+      }),
+      exists: tool({
+        description: 'Check if a file or directory exists',
+        inputSchema: z.object({
+          path: z.string().describe('The path to the file or directory to check'),
+        }),
+        execute: async ({ path }) => {
+          return fsTools.exists(path);
+        },
+      }),
+      searchFiles: tool({
+        description: 'Search for files',
+        inputSchema: z.object({
+          pattern: z.string().describe('The pattern to search for'),
+        }),
+        execute: async ({ pattern }) => {
+          return fsTools.searchFiles(pattern);
+        },
+      }),
+    },
     // TODO: add a custom stop condition to the streamText call
     // to force the agent to stop after 10 steps have been taken
-    stopWhen: TODO,
+    stopWhen: stepCountIs(10),
   });
 
+  const usage = await result.usage;
+  console.log("usage: ", usage);
+  
+
   return result.toUIMessageStreamResponse();
+
+  // const streamTextResult = streamText({
+  //   model: google('gemini-2.5-flash-image-preview'),
+  //   messages: modelMessages,
+  // });
+
+  // const stream = streamTextResult.toUIMessageStream();
+
+  // return createUIMessageStreamResponse({
+  //   stream,
+  // });
 };

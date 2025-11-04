@@ -3,9 +3,15 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatInput, Message, Wrapper } from './components.tsx';
 import './tailwind.css';
+import { DefaultChatTransport } from 'ai';
 
 const App = () => {
-  const { messages, sendMessage } = useChat({});
+  const chatConfig = {
+    transport: new DefaultChatTransport({
+      api: '/api/chatter',
+    }),
+  };
+  const { messages, sendMessage } = useChat(chatConfig);
 
   const [input, setInput] = useState(
     'Could you give me some financial advice?',

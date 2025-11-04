@@ -46,11 +46,37 @@ const result = await streamText({
     You are a helpful assistant that summarizes the content of a URL.
     </task-context>
 
+    <background-data>
+    Here is the content of the website:
+    <url>
+    ${url}
+    </url>
+    <content>
+    ${rawContent}
+    </content>
+    </background-data>
+
+    <conversation-history>
+    ${input}
+    </conversation-history>
+
+    <rules>
+    - Use the content of the website to answer the question.
+    - If the question is not related to the content of the website, say "Sorry, I can only answer questions about the content of the website."
+    - Use paragraphs in your output.
+    - Use quotes from the content of the website to answer the question.
+    </rules>
+
     <the-ask>
     Summarize the content of the website based on the conversation history.
     </the-ask>
+
+    <output-format>
+    Return only the summary
+    </output-format>
   `,
 });
+
 
 for await (const chunk of result.textStream) {
   process.stdout.write(chunk);
